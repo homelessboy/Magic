@@ -9,7 +9,7 @@
 CRGB leds[NUM_LEDS];
 
 Magic magic=Magic();
-unsigned long startTime;
+unsigned long startTimeF,startTimeC;
 int fram;
 
 void setup(){
@@ -17,17 +17,25 @@ void setup(){
   FastLED.addLeds<CHIPSET,LED_PIN,COLOR_ORDER>(leds,NUM_LEDS).setCorrection(TypicalLEDStrip);
   magic.getLed(leds);
   FastLED.show();
-  startTime=millis();
+  startTimeF=millis();
+  startTimeC=millis();
+  magic.addAction(Action(0));
+  magic.addAction(Action(1));
+  magic.addAction(Action(4,true,false));
 }
 
 void loop(){
-  if((millis()-startTime>1000/60)){
+  if((millis()-startTimeC>1000/300)){
+    magic.update();
+    startTimeC=millis();
+  }
+  if((millis()-startTimeF>1000/60)){
     magic.getLed(leds);
     FastLED.show();
-    Serial.println(fram);
+    // Serial.println(fram);
     if(60<=++fram){
       fram=0;
-      startTime=millis();
+      startTimeF=millis();
     }
   }
 }
