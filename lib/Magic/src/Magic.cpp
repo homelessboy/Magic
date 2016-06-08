@@ -29,6 +29,14 @@ int Magic::getIndex(int face, int i) {
   return face * 9 + i;
 }
 
+CRGB Magic::getMask(CRGB ledi,CRGB maski){
+  if(maski.r==0 && maski.g==0 && maski.b==0){
+    return ledi;
+  }else{
+    return maski;
+  }
+}
+
 Magic::Magic(CRGB *color,CRGB *mask8,CRGB *mask12,int circlePS,int middlePS,int surfacePS,int maskRound,unsigned long timeP){
   this->color=color;
   this->mask8=mask8;
@@ -58,7 +66,7 @@ Magic::Magic(){
   circlePS=3;
   middlePS=3;
   surfacePS=2;
-  maskRound=2;
+  maskRound=1;
   timeP=500;
   color[0]=CRGB(0,0,10);
   color[1]=CRGB(0,10,0);
@@ -121,10 +129,44 @@ void Magic::getLed(CRGB *led){
   }
   //todo: 完成mask计算
   if(startTime>0){
+    nowTime=millis();
+    int step=0;
     if(circleStep>0){
-
+      step=(nowTime-startTime)*12*maskRound/timeP;
+      for(int i=0;i<12;i++){
+        CRGB mask;
+        if(cw){
+          mask=mask12[(12+step-i)%12];
+        }else{
+          mask=mask12[(i+12+step)%12];
+        }
+        led[CIRCLE[operatSide][i].getIndex()]=getMask(led[CIRCLE[operatSide][i].getIndex()], mask);
+      }
     }
-
+    if(middleStep>0){
+      step=(nowTime-startTime)*12*maskRound/timeP;
+      for(int i=0;i<12;i++){
+        CRGB mask;
+        if(cw){
+          mask=mask12[(12+step-i)%12];
+        }else{
+          mask=mask12[(i+12+step)%12];
+        }
+        led[MIDDLE[operatSide][i].getIndex()]=getMask(led[MIDDLE[operatSide][i].getIndex()], mask);
+      }
+    }
+    if(surfaceStep>0){
+      step=(nowTime-startTime)*8*maskRound/timeP;
+      for(int i=0;i<8;i++){
+        CRGB mask;
+        if(cw){
+          mask=mask8[(8+step-i)%8];
+        }else{
+          mask=mask8[(i+8+step)%8];
+        }
+        led[SURFACE[operatSide][i].getIndex()]=getMask(led[SURFACE[operatSide][i].getIndex()], mask);
+      }
+    }
   }
 }
 

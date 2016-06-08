@@ -25,8 +25,9 @@ protected:
   void rotationP(P *ps, bool cw,int size,int step);
   int getIndex(int face,int x,int y);
   int getIndex(int face,int i);
+  CRGB getMask(CRGB ledi,CRGB maski);
 public:
-  Magic(CRGB *color,CRGB *mask8,CRGB *mask12,int circlePS=3,int middlePS=3,int surfacePS=2,int maskRound=2,unsigned long timeP=500);
+  Magic(CRGB *color,CRGB *mask8,CRGB *mask12,int circlePS=3,int middlePS=3,int surfacePS=2,int maskRound=1,unsigned long timeP=500);
   Magic();
   void setMask8(CRGB *mask8);
   void setMask12(CRGB *mask12);
