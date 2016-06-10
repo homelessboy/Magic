@@ -5,6 +5,12 @@
 #ifndef P_H
 #define P_H
 
+static int NUM[3][3]={
+  {0,1,2},
+  {7,8,3},
+  {6,5,4},
+};
+
 struct P {
     int face;
     int x;
@@ -22,6 +28,9 @@ public:
     }
     int getIndex() const {
         return face * 9 + y * 3 + x;
+    }
+    int getNum() const{
+      return NUM[y][x];
     }
 };
 
@@ -52,10 +61,22 @@ static P MIDDLE[6][12]={
         {P(3,1,2),P(3,1,1),P(3,1,0),P(2,1,2),P(2,1,1),P(2,1,0),P(1,1,2),P(1,1,1),P(1,1,0),P(0,1,2),P(0,1,1),P(0,1,0)},//正对5面中心层顺时针
 };
 
-static int LEFT[6]={3,0,1,2,3,3};
-static int RIGHT[6]={1,2,3,0,1,1};
-static int UP[6]={5,5,5,5,0,2};
-static int DOWN[6]={4,4,4,4,2,0};
-static int BACK[6]={2,3,0,1,5,4};
+//0:右；  1：下；  2：左；  3：上； 4：对面；5：自己；
+static int SIDE[6][6]={
+  {1,4,3,5,2,0},
+  {2,4,0,5,3,1},
+  {3,4,1,5,0,2},
+  {0,4,2,5,1,3},
+  {1,2,3,0,5,4},
+  {1,0,3,2,4,5},
+};
+
+// static int LEFT[6]={3,0,1,2,3,3};
+// static int RIGHT[6]={1,2,3,0,1,1};
+// static int UP[6]={5,5,5,5,0,2};
+// static int DOWN[6]={4,4,4,4,2,0};
+// static int BACK[6]={2,3,0,1,5,4};
+
+
 
 #endif //P_H

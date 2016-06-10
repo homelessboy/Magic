@@ -14,7 +14,7 @@ private:
   CRGB *color=new CRGB[6];
   CRGB *mask8=new CRGB[8];
   CRGB *mask12=new CRGB[12];
-  Action *actions=new Action[10];
+  Action *actions=new Action[56];
   int actionIndex=0;
   int cells[54];
   unsigned long startTime,lastUpdate,nowTime,timeP;
@@ -43,6 +43,7 @@ public:
   void getLed(CRGB *led);
   void update();
   void addAction(Action action);
+  void showFace(int front,int down);
 };
 
 #endif //MAGIC_H

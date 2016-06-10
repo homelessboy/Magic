@@ -67,7 +67,7 @@ Magic::Magic(){
   middlePS=3;
   surfacePS=2;
   maskRound=1;
-  timeP=500;
+  timeP=3000;
   color[0]=CRGB(0,0,10);
   color[1]=CRGB(0,10,0);
   color[2]=CRGB(0,10,10);

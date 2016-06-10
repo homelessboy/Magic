@@ -1,5 +1,6 @@
 #include <FastLED.h>
 #include "Magic.h"
+#include "MagicOperator.h"
 
 #define LED_PIN     2
 #define COLOR_ORDER RBG
@@ -9,6 +10,7 @@
 CRGB leds[NUM_LEDS];
 
 Magic magic=Magic();
+MagicOperator magicOperator=MagicOperator(&magic);
 unsigned long startTimeF,startTimeC;
 int fram;
 
@@ -19,9 +21,19 @@ void setup(){
   FastLED.show();
   startTimeF=millis();
   startTimeC=millis();
-  magic.addAction(Action(0));
-  magic.addAction(Action(1));
-  magic.addAction(Action(4,true,false));
+  // magic.addAction(Action(0));
+  // magic.addAction(Action(1));
+  // magic.addAction(Action(4,true,false));
+  magicOperator.setFace(0, 1);
+  magic.addAction(magicOperator.getAction(0+1*9));
+  magic.addAction(magicOperator.getAction(1+1*9));
+  magic.addAction(magicOperator.getAction(2+1*9));
+  magic.addAction(magicOperator.getAction(3+1*9));
+  magic.addAction(magicOperator.getAction(4+1*9));
+  magic.addAction(magicOperator.getAction(5+1*9));
+  magic.addAction(magicOperator.getAction(6+1*9));
+  magic.addAction(magicOperator.getAction(7+1*9));
+  magic.addAction(magicOperator.getAction(8+1*9));
 }
 
 void loop(){
