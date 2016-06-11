@@ -14,10 +14,12 @@ private:
   CRGB *color=new CRGB[6];
   CRGB *mask8=new CRGB[8];
   CRGB *mask12=new CRGB[12];
+  CRGB *SHOW=new CRGB[54];
+
   Action *actions=new Action[56];
   int actionIndex=0;
   int cells[54];
-  unsigned long startTime,lastUpdate,nowTime,timeP;
+  unsigned long startTime,lastUpdate,nowTime,timeP,showTime;
   int circleStep,middleStep,surfaceStep,operatSide;
   bool cw;
   int circlePS,middlePS,surfacePS,maskRound;

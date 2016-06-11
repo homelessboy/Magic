@@ -1,6 +1,16 @@
 #include "MagicOperator.h"
 
-int MagicOperator::getNum(P p){
+int MagicOperator::getNum(P p,int t,int frontSide){
+  if(t<0)
+    t=this->t;
+  if(frontSide<0)
+    frontSide=this->frontSide;
+  Serial.print("(front,t,num)");
+  Serial.print(frontSide);
+  Serial.print(",");
+  Serial.print(t);
+  Serial.print(",");
+  Serial.println(SURFACE[0][(surfaceD[frontSide][t][p.face]+p.getNum())%8].getNum());
   return SURFACE[0][(surfaceD[frontSide][t][p.face]+p.getNum())%8].getNum();
 }
 
@@ -83,10 +93,13 @@ Action MagicOperator::getActionDisWay(int index1,int index2){
   }
 }
 
-bool MagicOperator::isTowCenter(int index1,int index2){
-  P p1=P(index1);
-  P p2=P(index2);
-  return p1.getNum()==8 && p2.getNum()==8;
+bool MagicOperator::isAllCenter(){
+  P p;
+  for(int i=0;i<keyNum;i++){
+    if(P(keys[i]).getNum()!=8)
+      return false;
+  }
+  return true;
 }
 
 int MagicOperator::getSameSide(int index1,int index2){
@@ -137,22 +150,119 @@ int MagicOperator::getNumInMiddle(int side, int index){
   return -1;
 }
 
-MagicOperator::MagicOperator(Magic *magic){
+void MagicOperator::removeKey(int index){
+  for(int i=index;i<keyNum-1;i++){
+    keys[i]=keys[i+1];
+  }
+  keyNum--;
+}
+
+MagicOperator::MagicOperator(Magic *magic,Keypad *kpd){
   this->magic=magic;
+  this->kpd=kpd;
+}
+
+void MagicOperator::update(){
+  if(!kpd->getKeys())  return;
+  bool haveReleased=false;
+  for(int i=0;i<LIST_MAX;i++){
+    switch(kpd->key[i].kstate){
+      case PRESSED:
+        if(kpd->key[i].stateChanged){
+          actionEnd=true;
+          keys[keyNum]=kpd->key[i].kcode;
+          keyNum++;
+        }
+        break;
+      case RELEASED:
+        haveReleased=true;
+        break;
+      default:
+        break;
+    }
+  }
+  if(haveReleased && actionEnd){
+    switch (keyNum) {
+      case 1:
+        magic->addAction(getAction(keys[0]));
+        break;
+      case 2:
+        magic->addAction(getAction(keys[0],keys[1]));
+        break;
+      case 3:
+        if(setFace()<0)
+          goBack();
+        break;
+      case 4:
+        save();
+        break;
+      default:
+        break;
+    }
+  }
+  if(haveReleased){
+    actionEnd=false;
+    for(int i=0;i<LIST_MAX;i++){
+      if(kpd->key[i].kstate==RELEASED)
+        removeKey(i);
+    }
+    // for(int i=0;i<keyNum;i++)
+    //   Serial.println(keys[i]);
+  }
+
 }
 
 void MagicOperator::setFace(int frontSide,int downSide){
   this->frontSide=frontSide;
   this->downSide=downSide;
-  t=0;
+  t=getT(frontSide,downSide)>=0?getT(frontSide,downSide):t;
+}
+
+int MagicOperator::getT(int frontSide,int downSide){
+  int tmpT=-1;
   if(SIDE[frontSide][1]==downSide)
-    t=0;
+    tmpT=0;
   else if(SIDE[frontSide][0]==downSide)
-    t=1;
+    tmpT=1;
   else if(SIDE[frontSide][3]==downSide)
-    t=2;
+    tmpT=2;
   else if(SIDE[frontSide][2]==downSide)
-    t=3;
+    tmpT=3;
+  Serial.println(tmpT);
+  return tmpT;
+}
+
+int MagicOperator::setFace(){
+  Serial.println("in setFace");
+  int side=-1;
+  int tmpT;
+  int down;
+  int front;
+  P plist[3]={
+    P(keys[0]),
+    P(keys[1]),
+    P(keys[2]),
+  };
+  for(int i=0;i<3;i++){
+    for(int j=0;j<3;j++){
+      if(i!=j){
+        tmpT=getT(plist[i].face, plist[j].face);
+        if(tmpT>=0&&getNum(plist[i],tmpT,plist[i].face)==3&&getNum(plist[3-i-j],tmpT,plist[i].face)==7){
+          setFace(plist[i].face, plist[j].face);
+          magic->showFace(plist[i].face, plist[j].face);
+          return 0;
+        }
+      }
+    }
+  }
+  return -1;
+}
+
+int MagicOperator::goBack(){
+  return -1;
+}
+int MagicOperator::save(){
+  return -1;
 }
 
 Action MagicOperator::getAction(int index){
@@ -234,7 +344,7 @@ Action MagicOperator::getAction(int index){
   return Action(-1);
 }
 Action MagicOperator::getAction(int index1, int index2){
-  if(isTowCenter(index1, index2)){
+  if(isAllCenter()){
     magic->showFace(frontSide,downSide);
     return Action(-1);
   }

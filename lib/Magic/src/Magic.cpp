@@ -67,7 +67,7 @@ Magic::Magic(){
   middlePS=3;
   surfacePS=2;
   maskRound=1;
-  timeP=3000;
+  timeP=500;
   color[0]=CRGB(0,0,10);
   color[1]=CRGB(0,10,0);
   color[2]=CRGB(0,10,10);
@@ -127,9 +127,14 @@ void Magic::getLed(CRGB *led){
   for(int i=0;i<54;i++){
     led[i]=color[cells[i]];
   }
-  //todo: 完成mask计算
+  nowTime=millis();
+  if(nowTime<showTime){
+    for(int i=0;i<54;i++)
+      led[i]=SHOW[i];
+    return;
+  }
   if(startTime>0){
-    nowTime=millis();
+
     int step=0;
     if(circleStep>0){
       step=(nowTime-startTime)*12*maskRound/timeP;
@@ -225,4 +230,14 @@ void Magic::addAction(Action action){
     actions[actionIndex]=action;
     actionIndex++;
   }
+}
+
+void Magic::showFace(int front,int down){
+  for(int i=0;i<54;i++)
+    SHOW[i]=CRGB(0,0,0);
+  showTime=millis()+1000;
+  for(int i=0;i<9;i++){
+    SHOW[down*9+i]=CRGB(10,0,0);
+  }
+  SHOW[front*9+4]=CRGB(10,0,0);
 }
