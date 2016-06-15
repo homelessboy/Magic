@@ -8,7 +8,7 @@ class MagicOperator{
 private:
   Magic *magic;
   int frontSide=0,downSide=4;
-  bool useSameWay=true,useDisWay=true,useForMiddle=true;
+  bool useSameWay=false,useDisWay=true,useForMiddle=true,useSingle=true;
   int t;
   int keys[54];
   int keyNum=0;
@@ -39,6 +39,8 @@ public:
   int setFace();
   int goBack();
   int save();
+  int clear();
+  int random();
   Action getAction(int index);//前后->左右;上下->前后;左右->上下
   Action getAction(int index1,int index2);
 

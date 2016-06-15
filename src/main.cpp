@@ -23,7 +23,7 @@ byte rowPins[ROWS] = {32, 33, 34, 35, 36, 37}; //connect to the row pinouts of t
 byte colPins[COLS] = {22, 23, 24, 25, 26, 27, 28, 29, 30}; //connect to the column pinouts of the kpd
 Keypad kpd = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 
-Magic magic=Magic();
+Magic magic=Magic(leds);
 MagicOperator magicOperator=MagicOperator(&magic,&kpd);
 unsigned long startTimeF,startTimeC;
 int fram;
@@ -31,7 +31,7 @@ int fram;
 void setup(){
   Serial.begin(9600);
   FastLED.addLeds<CHIPSET,LED_PIN,COLOR_ORDER>(leds,NUM_LEDS).setCorrection(TypicalLEDStrip);
-  magic.getLed(leds);
+  magic.getLed();
   FastLED.show();
   startTimeF=millis();
   startTimeC=millis();
@@ -48,6 +48,7 @@ void setup(){
   // magic.addAction(magicOperator.getAction(6+1*9));
   // magic.addAction(magicOperator.getAction(7+1*9));
   // magic.addAction(magicOperator.getAction(8+1*9));
+  Serial.println("hello");
 }
 
 void loop(){
@@ -57,7 +58,7 @@ void loop(){
     startTimeC=millis();
   }
   if((millis()-startTimeF>1000/60)){
-    magic.getLed(leds);
+    magic.getLed();
     FastLED.show();
     // Serial.println(fram);
     if(60<=++fram){

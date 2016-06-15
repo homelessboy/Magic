@@ -6,7 +6,7 @@
 void Magic::rotationP(P *ps, bool cw, int size, int step) {
   while (step-- > 0) {
     P p = ps[0];
-    int tmp = cells[p.getIndex()];
+    byte tmp = cells[p.getIndex()];
     for (int i = 1; i < size; i++) {
       P next;
       if (!cw) {
@@ -37,76 +37,110 @@ CRGB Magic::getMask(CRGB ledi,CRGB maski){
   }
 }
 
-Magic::Magic(CRGB *color,CRGB *mask8,CRGB *mask12,int circlePS,int middlePS,int surfacePS,int maskRound,unsigned long timeP){
-  this->color=color;
-  this->mask8=mask8;
-  this->mask12=mask12;
-  this->circlePS=circlePS;
-  this->middlePS=middlePS;
-  this->surfacePS=surfacePS;
-  this->maskRound=maskRound;
-  this->timeP=timeP;
-  circleStep=0;
-  middleStep=0;
-  surfaceStep=0;
-  operatSide=-1;
-  for(int i=0;i<6;i++){
-    for(int j=0;j<9;j++){
-      cells[getIndex(i, j)]=i;
-    }
-  }
+Magic::Magic(CRGB *led){
+  this->led=led;
+  setDefault();
 }
 
-Magic::Magic(){
-//  this->color=new CRGB[6];
+void Magic::setDefault(){
   circleStep=0;
   middleStep=0;
   surfaceStep=0;
   operatSide=-1;
-  circlePS=3;
-  middlePS=3;
-  surfacePS=2;
-  maskRound=1;
-  timeP=500;
-  color[0]=CRGB(0,0,10);
-  color[1]=CRGB(0,10,0);
-  color[2]=CRGB(0,10,10);
-  color[3]=CRGB(10,0,0);
-  color[4]=CRGB(10,0,10);
-  color[5]=CRGB(10,10,0);
-  mask8[0]=CRGB(15,0,0);mask8[1]=CRGB(30,0,0);mask8[2]=CRGB(60,0,0);mask8[3]=CRGB(0,0,0);
-  mask8[4]=CRGB(0,0,0);mask8[5]=CRGB(0,0,0);mask8[6]=CRGB(0,0,0);mask8[7]=CRGB(0,0,0);
-  mask12[0]=CRGB(15,0,0);mask12[1]=CRGB(30,0,0);mask12[2]=CRGB(60,0,0);mask12[3]=CRGB(0,0,0);
-  mask12[4]=CRGB(0,0,0);mask12[5]=CRGB(0,0,0);mask12[6]=CRGB(0,0,0);mask12[7]=CRGB(0,0,0);
-  mask12[8]=CRGB(0,0,0);mask12[9]=CRGB(0,0,0);mask12[10]=CRGB(0,0,0);mask12[12]=CRGB(0,0,0);
-  for(int i=0;i<6;i++){
+  setCirclePS();
+  setMiddlePS();
+  setSurfacePS();
+  setMaskRound();
+  setTimeP();
+  setMask8();
+  setMask12();
+  setColor();
+  clear(false);
+}
+
+void Magic::clear(bool ok){
+  if(ok) OK();
+  delete(cells);
+  cells=new byte[54];
+  for(byte i=0;i<6;i++){
     for(int j=0;j<9;j++){
       cells[getIndex(i, j)]=i;
     }
   }
+  romOperator.saveCells(cells);
 }
+
 void Magic::setMask8(CRGB *mask8){
+  if(mask8==NULL){
+    mask8=new CRGB[8];
+    mask8[0]=CRGB(15,0,0);mask8[1]=CRGB(30,0,0);mask8[2]=CRGB(60,0,0);mask8[3]=CRGB(0,0,0);
+    mask8[4]=CRGB(0,0,0);mask8[5]=CRGB(0,0,0);mask8[6]=CRGB(0,0,0);mask8[7]=CRGB(0,0,0);
+  }
+  delete(this->mask8);
   this->mask8=mask8;
 }
+CRGB* Magic::getMask8(){
+  return mask8;
+}
 void Magic::setMask12(CRGB *mask12){
+  if(mask12==NULL){
+    mask12=new CRGB[12];
+    mask12[0]=CRGB(15,0,0);mask12[1]=CRGB(30,0,0);mask12[2]=CRGB(60,0,0);mask12[3]=CRGB(0,0,0);
+    mask12[4]=CRGB(0,0,0);mask12[5]=CRGB(0,0,0);mask12[6]=CRGB(0,0,0);mask12[7]=CRGB(0,0,0);
+    mask12[8]=CRGB(0,0,0);mask12[9]=CRGB(0,0,0);mask12[10]=CRGB(0,0,0);mask12[11]=CRGB(0,0,0);
+  }
+  delete(this->mask12);
   this->mask12=mask12;
 }
-void Magic::setCirclePS(int circlePS){
+CRGB* Magic::getMask12(){
+  return mask12;
+}
+void Magic::setColor(CRGB *color){
+  if(color==NULL){
+    color=new CRGB[6];
+    color[0]=CRGB(0,0,10);
+    color[1]=CRGB(0,10,0);
+    color[2]=CRGB(0,10,10);
+    color[3]=CRGB(10,0,0);
+    color[4]=CRGB(10,0,10);
+    color[5]=CRGB(10,10,0);
+  }
+  delete (this->color);
+  this->color=color;
+}
+CRGB* Magic::getColor(){
+  return color;
+}
+void Magic::setCirclePS(byte circlePS){
   this->circlePS=circlePS;
 }
-void Magic::setMiddlePS(int middlePS){
+byte Magic::getCirclePS(){
+  return circlePS;
+}
+void Magic::setMiddlePS(byte middlePS){
   this->middlePS=middlePS;
 }
-void Magic::setSurfacePS(int surfacePS){
+byte Magic::getMiddlePS(){
+  return middlePS;
+}
+void Magic::setSurfacePS(byte surfacePS){
   this->surfacePS=surfacePS;
 }
-void Magic::setMaskRound(int maskRound){
+byte Magic::getSurfacePS(){
+  return surfacePS;
+}
+void Magic::setMaskRound(byte maskRound){
   this->maskRound=maskRound;
+}
+byte Magic::getMaskRound(){
+  return maskRound;
 }
 void Magic::setTimeP(unsigned long timeP){
   this->timeP=timeP;
 }
-
+unsigned long Magic::getTimeP(){
+  return timeP;
+}
 void Magic::rotationMiddle(int surface, bool cw, int step) {
   rotationP(MIDDLE[surface], cw, 12, step);
 }
@@ -119,11 +153,7 @@ void Magic::rotationCircle(int surface, bool cw, int step) {
   rotationP(CIRCLE[surface], cw, 12, step);
 }
 
-void Magic::setColor(CRGB *color){
-  this->color=color;
-}
-
-void Magic::getLed(CRGB *led){
+void Magic::getLed(){
   for(int i=0;i<54;i++){
     led[i]=color[cells[i]];
   }
@@ -134,7 +164,6 @@ void Magic::getLed(CRGB *led){
     return;
   }
   if(startTime>0){
-
     int step=0;
     if(circleStep>0){
       step=(nowTime-startTime)*12*maskRound/timeP;
@@ -199,6 +228,8 @@ void Magic::update(){
   if(startTime!=0&&operatSide>=0){
     if(circleStep!=0){
       int circleStepTmp=circlePS-(nowTime-startTime)*circlePS/timeP;
+      if(circleStepTmp<0)
+        circleStepTmp=0;
       if(circleStepTmp<circleStep){
         rotationCircle(operatSide,cw,circleStep-circleStepTmp);
         circleStep=circleStepTmp;
@@ -206,6 +237,8 @@ void Magic::update(){
     }
     if(surfaceStep!=0){
       int surfaceStepTmp=surfacePS-(nowTime-startTime)*surfacePS/timeP;
+      if(surfaceStepTmp<0)
+        surfaceStepTmp=0;
       if(surfaceStepTmp<surfaceStep){
         rotationSurface(operatSide,cw,surfaceStep-surfaceStepTmp);
         surfaceStep=surfaceStepTmp;
@@ -213,6 +246,8 @@ void Magic::update(){
     }
     if(middleStep!=0){
       int middleStepTmp=middlePS-(nowTime-startTime)*middlePS/timeP;
+      if(middleStepTmp<0)
+        middleStepTmp=0;
       if(middleStepTmp<middleStep){
         rotationMiddle(operatSide,cw,middleStep-middleStepTmp);
         middleStep=middleStepTmp;
@@ -222,6 +257,11 @@ void Magic::update(){
   if(startTime!=0&&circleStep==0&&surfaceStep==0&&middleStep==0){
     startTime=0;
     operatSide=-1;
+    if(actionIndex==0&&tmpTimeP>0){
+      timeP=tmpTimeP;
+      tmpTimeP=0;
+    }
+    romOperator.saveCells(cells);
   }
 }
 
@@ -229,6 +269,8 @@ void Magic::addAction(Action action){
   if(action.surface>=0){
     actions[actionIndex]=action;
     actionIndex++;
+    if(memChoice>=0)
+      choice();
   }
 }
 
@@ -239,5 +281,74 @@ void Magic::showFace(int front,int down){
   for(int i=0;i<9;i++){
     SHOW[down*9+i]=CRGB(10,0,0);
   }
+  SHOW[front*9+1]=CRGB(10,0,0);
+  SHOW[front*9+3]=CRGB(10,0,0);
   SHOW[front*9+4]=CRGB(10,0,0);
+  SHOW[front*9+5]=CRGB(10,0,0);
+  SHOW[front*9+7]=CRGB(10,0,0);
+}
+
+void Magic::random(int i,unsigned long timeRandom){
+  if(tmpTimeP==0){
+    tmpTimeP=timeP;
+    timeP=timeRandom;
+  }
+  srand(millis());
+  for(int i=0;i<20;i++){
+    int t=randomx(18);
+    int side=(t/2)%6;
+    if(t>15)
+      side=5;
+    addAction(Action(side,t%2==1,t/2>=6));
+  }
+ OK();
+}
+
+void Magic::save(){
+  numMeM++;
+  if(numMeM>5)
+    numMeM=5;
+  for(int i=numMeM;i>1;i--){
+    cellMeM[i-1]=cellMeM[i-2];
+  }
+  delete(cellMeM[0]);
+  cellMeM[0]=new byte[54];
+  for(int i=0;i<54;i++){
+    cellMeM[0][i]=cells[i];
+  }
+  OK();
+}
+
+void Magic::goBack(){
+  if(!numMeM>0)
+    return;
+  memChoice++;
+  if(memChoice>=numMeM)
+    memChoice=0;
+  for(int i=0;i<54;i++)
+    cells[i]=cellMeM[memChoice][i];
+  OK(300);
+}
+
+void Magic::choice(){
+  byte* tmp=cellMeM[memChoice];
+  for(int i=memChoice;i>0;i--){
+    cellMeM[i]=cellMeM[i-1];
+  }
+  cellMeM[0]=tmp;
+  memChoice=-1;
+}
+
+void Magic::OK(unsigned long time){
+  for(int i=0;i<54;i++)
+    led[i]=CRGB(0,0,10);
+  FastLED.show();
+  delay(time);
+}
+
+void Magic::NOTOK(unsigned long time){
+  for(int i=0;i<54;i++)
+    led[i]=CRGB(10,0,0);
+  FastLED.show();
+  delay(time);
 }

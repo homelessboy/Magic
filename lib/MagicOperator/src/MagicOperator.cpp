@@ -5,12 +5,6 @@ int MagicOperator::getNum(P p,int t,int frontSide){
     t=this->t;
   if(frontSide<0)
     frontSide=this->frontSide;
-  Serial.print("(front,t,num)");
-  Serial.print(frontSide);
-  Serial.print(",");
-  Serial.print(t);
-  Serial.print(",");
-  Serial.println(SURFACE[0][(surfaceD[frontSide][t][p.face]+p.getNum())%8].getNum());
   return SURFACE[0][(surfaceD[frontSide][t][p.face]+p.getNum())%8].getNum();
 }
 
@@ -76,6 +70,8 @@ Action MagicOperator::getActionDisWay(int index1,int index2){
       d2=t1-t2;
       d1=12+t2-t1;
     }
+    if(d1==d2)
+      return Action(-1);
     return Action(side,d1<d2);
   }else if(useForMiddle){
     side=getSameMiddle(index1, index2);
@@ -89,6 +85,8 @@ Action MagicOperator::getActionDisWay(int index1,int index2){
       d2=t1-t2;
       d1=12+t2-t1;
     }
+    if(d1==d2)
+      return Action(-1);
     return Action(side,d1<d2,false);
   }
 }
@@ -194,7 +192,9 @@ void MagicOperator::update(){
           goBack();
         break;
       case 4:
-        save();
+        if(save()<0)
+          if(clear()<0)
+            random();
         break;
       default:
         break;
@@ -228,12 +228,10 @@ int MagicOperator::getT(int frontSide,int downSide){
     tmpT=2;
   else if(SIDE[frontSide][2]==downSide)
     tmpT=3;
-  Serial.println(tmpT);
   return tmpT;
 }
 
 int MagicOperator::setFace(){
-  Serial.println("in setFace");
   int side=-1;
   int tmpT;
   int down;
@@ -259,10 +257,38 @@ int MagicOperator::setFace(){
 }
 
 int MagicOperator::goBack(){
+  if(isAllCenter()){
+    magic->goBack();
+    return 1;
+  }
   return -1;
 }
 int MagicOperator::save(){
+  if(isAllCenter()){
+    magic->save();
+    return 1;
+  }
   return -1;
+}
+int MagicOperator::clear(){
+  int side=P(keys[0]).face;
+  for(int i=0;i<4;i++){
+    P tmpP=P(keys[i]);
+    if(tmpP.face!=side)
+      return -1;
+    if(tmpP.getNum()%2!=0 || tmpP.getNum()==8)
+      return -1;
+  }
+  magic->clear();
+}
+int MagicOperator::random(){
+  int side=P(keys[0]).face;
+  for(int i=0;i<4;i++){
+    P tmpP=P(keys[i]);
+    if(tmpP.face!=side||tmpP.getNum()%2!=1)
+      return -1;
+  }
+  magic->random();
 }
 
 Action MagicOperator::getAction(int index){
@@ -278,6 +304,7 @@ Action MagicOperator::getAction(int index){
   }else if(p.getNum()==7){
     return Action(SIDE[p.face][3],true,false);
   }
+  if(!useSingle) return Action(-1);
   int num=getNum(p);
   if(num<0) return Action(-1);
   if(p.face==frontSide){
