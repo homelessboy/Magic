@@ -341,7 +341,7 @@ void Magic::choice(){
 
 void Magic::OK(unsigned long time){
   for(int i=0;i<54;i++)
-    led[i]=CRGB(0,0,10);
+    led[i]=CRGB(0,10,0);
   FastLED.show();
   delay(time);
 }

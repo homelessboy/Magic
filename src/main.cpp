@@ -3,7 +3,7 @@
 #include "MagicOperator.h"
 
 #define LED_PIN     2
-#define COLOR_ORDER RBG
+#define COLOR_ORDER RGB
 #define CHIPSET     WS2811
 #define NUM_LEDS    54
 
