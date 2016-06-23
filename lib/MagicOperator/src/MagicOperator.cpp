@@ -233,6 +233,8 @@ void MagicOperator::update(){
           if(clear()<0)
             random();
         break;
+      case 5:
+        resetAll();
       default:
         break;
     }
@@ -331,6 +333,15 @@ int MagicOperator::random(){
       return -1;
   }
   magic->random();
+}
+
+int MagicOperator::resetAll(){
+  if(!isAllCenter())
+    return -1;
+  rom.setNewone(true);
+  magic->OK();
+  resetFunc();
+  return 0;
 }
 
 Action MagicOperator::getAction(int index){

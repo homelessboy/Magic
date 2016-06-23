@@ -16,6 +16,7 @@ private:
   Keypad *kpd;
   bool actionEnd=true;
   EEPROMOperator rom=EEPROMOperator();
+  void(* resetFunc) (void) = 0;
 protected:
   int getNum(P p,int t=-1,int frontSide=-1);//postion[0前后，1左右，2上下]
   int getSide(int side);//0:右；  1：下；  2：左；  3：上； 4：对面；5：自己；
@@ -50,6 +51,7 @@ public:
   int save();
   int clear();
   int random();
+  int resetAll();
   Action getAction(int index);//前后->左右;上下->前后;左右->上下
   Action getAction(int index1,int index2);
 
