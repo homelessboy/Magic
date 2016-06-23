@@ -23,16 +23,16 @@ private:
   Action *actions=new Action[56];
   int actionIndex=0;
   byte* cells;
-  byte* cellMeM[5];
+  byte* cellMem[5];
   byte numMeM=0;
   int memChoice=-1;
   unsigned long startTime,lastUpdate,nowTime,timeP,showTime,tmpTimeP;
   unsigned long timeTTT=0;
   byte circleStep,middleStep,surfaceStep,operatSide;
   bool cw;
-  int circlePS,middlePS,surfacePS,maskRound;
+  byte circlePS,middlePS,surfacePS,maskRound;
 
-  EEPROMOperator romOperator=EEPROMOperator();
+  EEPROMOperator rom=EEPROMOperator();
 protected:
   void rotationP(P *ps, bool cw,int size,int step);
   int getIndex(int face,int x,int y);
@@ -40,24 +40,32 @@ protected:
   CRGB getMask(CRGB ledi,CRGB maski);
 public:
   Magic(CRGB *led);
+  void setFromMem();
   void setDefault();
-  void clear(bool ok=true);
-  void setMask8(CRGB *mask8=NULL);
+
+  void setCell(byte *cell=NULL,bool fromMem=false);
+  byte* getCell();
+  void setMemDefault();
+  void setMemFromMem();
+  void saveMem();
+  
+  void setMask8(CRGB *mask8=NULL,bool fromMem=false);
   CRGB* getMask8();
-  void setMask12(CRGB *mask12=NULL);
+  void setMask12(CRGB *mask12=NULL,bool fromMem=false);
   CRGB* getMask12();
-  void setColor(CRGB *color=NULL);
+  void setColor(CRGB *color=NULL,bool fromMem=false);
   CRGB* getColor();
-  void setCirclePS(byte circlePS=3);
+  void setCirclePS(byte circlePS=3,bool fromMem=false);
   byte getCirclePS();
-  void setMiddlePS(byte middlePS=3);
+  void setMiddlePS(byte middlePS=3,bool fromMem=false);
   byte getMiddlePS();
-  void setSurfacePS(byte surfacePS=2);
+  void setSurfacePS(byte surfacePS=2,bool fromMem=false);
   byte getSurfacePS();
-  void setMaskRound(byte maskRound=1);
+  void setMaskRound(byte maskRound=1,bool fromMem=false);
   byte getMaskRound();
-  void setTimeP(unsigned long timeP=500);
+  void setTimeP(unsigned long timeP=500,bool fromMem=false);
   unsigned long getTimeP();
+
   void rotationMiddle(int surface,bool cw=true,int step=1);
   void rotationSurface(int surface,bool cw=true,int step=1);
   void rotationCircle(int surface,bool cw=true,int step=1);

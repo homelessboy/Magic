@@ -25,33 +25,33 @@ Keypad kpd = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 
 Magic magic=Magic(leds);
 MagicOperator magicOperator=MagicOperator(&magic,&kpd);
+EEPROMOperator rom=EEPROMOperator();
 unsigned long startTimeF,startTimeC;
 int fram;
 
 void setup(){
   Serial.begin(9600);
+  Serial1.begin(9600);
   FastLED.addLeds<CHIPSET,LED_PIN,COLOR_ORDER>(leds,NUM_LEDS).setCorrection(TypicalLEDStrip);
   magic.getLed();
   FastLED.show();
   startTimeF=millis();
   startTimeC=millis();
-  // magic.addAction(Action(0));
-  // magic.addAction(Action(1));
-  // magic.addAction(Action(4,true,false));
-  magicOperator.setFace(1, 4);
-  // magic.addAction(magicOperator.getAction(0+1*9));
-  // magic.addAction(magicOperator.getAction(1+1*9));
-  // magic.addAction(magicOperator.getAction(2+1*9));
-  // magic.addAction(magicOperator.getAction(3+1*9));
-  // magic.addAction(magicOperator.getAction(4+1*9));
-  // magic.addAction(magicOperator.getAction(5+1*9));
-  // magic.addAction(magicOperator.getAction(6+1*9));
-  // magic.addAction(magicOperator.getAction(7+1*9));
-  // magic.addAction(magicOperator.getAction(8+1*9));
-  Serial.println("hello");
+  rom.setNewone(false);  
 }
 
 void loop(){
+  // while(Serial1.available()){
+  //   String read=Serial1.readStringUntil('\n');
+  //   Serial.print(read);
+  //   if(read.equals("ok")){
+  //     Serial1.println("ok");
+  //   }
+  // }
+  // while(Serial.available()){
+  //   char c=(char)Serial.read();
+  //   Serial1.print(c);
+  // }
   magicOperator.update();
   if((millis()-startTimeC>1000/300)){
     magic.update();
@@ -60,7 +60,6 @@ void loop(){
   if((millis()-startTimeF>1000/60)){
     magic.getLed();
     FastLED.show();
-    // Serial.println(fram);
     if(60<=++fram){
       fram=0;
       startTimeF=millis();

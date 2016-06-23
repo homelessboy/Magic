@@ -39,7 +39,28 @@ CRGB Magic::getMask(CRGB ledi,CRGB maski){
 
 Magic::Magic(CRGB *led){
   this->led=led;
-  setDefault();
+  if(rom.isNewone()){
+    setDefault();
+  }else{
+    setFromMem();
+  }
+}
+
+void Magic::setFromMem(){
+  circleStep=0;
+  middleStep=0;
+  surfaceStep=0;
+  operatSide=-1;
+  setCirclePS(rom.getCirclePS(),true);
+  setMiddlePS(rom.getMiddlePS(),true);
+  setSurfacePS(rom.getSurfacePS(),true);
+  setMaskRound(rom.getMaskRound(),true);
+  setTimeP(rom.getTimeP(),true);
+  setMask8(rom.getMask8(),true);
+  setMask12(rom.getMask12(),true);
+  setColor(rom.getColor(),true);
+  setCell(rom.getCell(),true);
+  setMemFromMem();
 }
 
 void Magic::setDefault(){
@@ -55,22 +76,54 @@ void Magic::setDefault(){
   setMask8();
   setMask12();
   setColor();
-  clear(false);
+  setCell();
+  setMemDefault();
 }
 
-void Magic::clear(bool ok){
-  if(ok) OK();
-  delete(cells);
-  cells=new byte[54];
-  for(byte i=0;i<6;i++){
-    for(int j=0;j<9;j++){
-      cells[getIndex(i, j)]=i;
-    }
+void Magic::setCell(byte *cell,bool fromMem){
+  if(cell==NULL){
+    cell=new byte[54];
+    for(byte i=0;i<6;i++)
+      for(int j=0;j<9;j++)
+        cell[getIndex(i, j)]=i;
   }
-  romOperator.saveCells(cells);
+  delete(cells);
+  this->cells=cell;
+  if(!fromMem)
+    rom.setCell(cell);
 }
 
-void Magic::setMask8(CRGB *mask8){
+byte* Magic::getCell(){
+  return cells;
+}
+
+void Magic::setMemDefault(){
+  for(int i=0;i<5;i++){
+    delete (cellMem[i]);
+    cellMem[i]=new byte[54];
+    numMeM=0;
+    saveMem();
+  }
+}
+
+void Magic::setMemFromMem(){
+  for(int i=0;i<5;i++){
+    delete(cellMem[i]);
+    cellMem[i]=new byte[54];
+  }
+  numMeM=rom.getMemNum();
+  for(int i=0;i<numMeM;i++){
+    cellMem[i]=rom.getMem(i);
+  }
+}
+
+void Magic::saveMem(){
+  rom.setMemNum(numMeM);
+  for(int i=0;i<numMeM;i++)
+    rom.setMem(cellMem[i], i);
+}
+
+void Magic::setMask8(CRGB *mask8,bool fromMem){
   if(mask8==NULL){
     mask8=new CRGB[8];
     mask8[0]=CRGB(15,0,0);mask8[1]=CRGB(30,0,0);mask8[2]=CRGB(60,0,0);mask8[3]=CRGB(0,0,0);
@@ -78,11 +131,13 @@ void Magic::setMask8(CRGB *mask8){
   }
   delete(this->mask8);
   this->mask8=mask8;
+  if(!fromMem)
+    rom.setMask8(mask8);
 }
 CRGB* Magic::getMask8(){
   return mask8;
 }
-void Magic::setMask12(CRGB *mask12){
+void Magic::setMask12(CRGB *mask12,bool fromMem){
   if(mask12==NULL){
     mask12=new CRGB[12];
     mask12[0]=CRGB(15,0,0);mask12[1]=CRGB(30,0,0);mask12[2]=CRGB(60,0,0);mask12[3]=CRGB(0,0,0);
@@ -91,11 +146,13 @@ void Magic::setMask12(CRGB *mask12){
   }
   delete(this->mask12);
   this->mask12=mask12;
+  if(!fromMem)
+    rom.setMask12(mask12);
 }
 CRGB* Magic::getMask12(){
   return mask12;
 }
-void Magic::setColor(CRGB *color){
+void Magic::setColor(CRGB *color,bool fromMem){
   if(color==NULL){
     color=new CRGB[6];
     color[0]=CRGB(0,0,10);
@@ -107,36 +164,48 @@ void Magic::setColor(CRGB *color){
   }
   delete (this->color);
   this->color=color;
+  if(!fromMem)
+    rom.setColor(color);
 }
 CRGB* Magic::getColor(){
   return color;
 }
-void Magic::setCirclePS(byte circlePS){
+void Magic::setCirclePS(byte circlePS,bool fromMem){
   this->circlePS=circlePS;
+  if(!fromMem)
+    rom.setCirclePS(circlePS);
 }
 byte Magic::getCirclePS(){
   return circlePS;
 }
-void Magic::setMiddlePS(byte middlePS){
+void Magic::setMiddlePS(byte middlePS,bool fromMem){
   this->middlePS=middlePS;
+  if(!fromMem)
+    rom.setMiddlePS(middlePS);
 }
 byte Magic::getMiddlePS(){
   return middlePS;
 }
-void Magic::setSurfacePS(byte surfacePS){
+void Magic::setSurfacePS(byte surfacePS,bool fromMem){
   this->surfacePS=surfacePS;
+  if(!fromMem)
+    rom.setSurfacePS(surfacePS);
 }
 byte Magic::getSurfacePS(){
   return surfacePS;
 }
-void Magic::setMaskRound(byte maskRound){
+void Magic::setMaskRound(byte maskRound,bool fromMem){
   this->maskRound=maskRound;
+  if(!fromMem)
+    rom.setMaskRound(maskRound);
 }
 byte Magic::getMaskRound(){
   return maskRound;
 }
-void Magic::setTimeP(unsigned long timeP){
+void Magic::setTimeP(unsigned long timeP,bool fromMem){
   this->timeP=timeP;
+  if(!fromMem)
+    rom.setTimeP(timeP);
 }
 unsigned long Magic::getTimeP(){
   return timeP;
@@ -261,7 +330,7 @@ void Magic::update(){
       timeP=tmpTimeP;
       tmpTimeP=0;
     }
-    romOperator.saveCells(cells);
+    rom.setCell(cells);
   }
 }
 
@@ -309,13 +378,14 @@ void Magic::save(){
   if(numMeM>5)
     numMeM=5;
   for(int i=numMeM;i>1;i--){
-    cellMeM[i-1]=cellMeM[i-2];
+    cellMem[i-1]=cellMem[i-2];
   }
-  delete(cellMeM[0]);
-  cellMeM[0]=new byte[54];
+  delete(cellMem[0]);
+  cellMem[0]=new byte[54];
   for(int i=0;i<54;i++){
-    cellMeM[0][i]=cells[i];
+    cellMem[0][i]=cells[i];
   }
+  saveMem();
   OK();
 }
 
@@ -326,16 +396,16 @@ void Magic::goBack(){
   if(memChoice>=numMeM)
     memChoice=0;
   for(int i=0;i<54;i++)
-    cells[i]=cellMeM[memChoice][i];
+    cells[i]=cellMem[memChoice][i];
   OK(300);
 }
 
 void Magic::choice(){
-  byte* tmp=cellMeM[memChoice];
+  byte* tmp=cellMem[memChoice];
   for(int i=memChoice;i>0;i--){
-    cellMeM[i]=cellMeM[i-1];
+    cellMem[i]=cellMem[i-1];
   }
-  cellMeM[0]=tmp;
+  cellMem[0]=tmp;
   memChoice=-1;
 }
 

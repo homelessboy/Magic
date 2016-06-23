@@ -3,17 +3,19 @@
 
 #include "Magic.h"
 #include "Keypad.h"
+#include "EEPROMOperator.h"
 
 class MagicOperator{
 private:
   Magic *magic;
-  int frontSide=0,downSide=4;
-  bool useSameWay=false,useDisWay=true,useForMiddle=true,useSingle=true;
+  byte frontSide=0,downSide=4;
+  bool doubleSame=false,doubleDis=true,singleWay=true;
   int t;
   int keys[54];
   int keyNum=0;
   Keypad *kpd;
   bool actionEnd=true;
+  EEPROMOperator rom=EEPROMOperator();
 protected:
   int getNum(P p,int t=-1,int frontSide=-1);//postion[0前后，1左右，2上下]
   int getSide(int side);//0:右；  1：下；  2：左；  3：上； 4：对面；5：自己；
@@ -33,8 +35,15 @@ protected:
   void removeKey(int index);
 public:
   MagicOperator(Magic *magic,Keypad *kpd);
+  void setDoubleSame(bool doubleSame=true,bool fromMem=false);
+  bool getDoubleSame();
+  void setDoubleDis(bool doubleDis=true,bool fromMem=false);
+  bool getDoubleDis();
+  void setSingleWay(bool singleWay=true,bool fromMem=false);
+  bool getSignleWay();
+  void setFaceInit(byte frontSide=0,byte downSide=4,bool fromMem=false);
+
   void update();
-  void setFace(int frontSide,int downSide);
   int getT(int frontSide,int downSide);
   int setFace();
   int goBack();

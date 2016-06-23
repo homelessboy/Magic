@@ -34,7 +34,7 @@ int MagicOperator::getFrontSide(){
 }
 
 Action MagicOperator::getActionSameWay(int index1,int index2){
-  if(!useSameWay) return Action(-1);
+  if(!doubleSame) return Action(-1);
   int side=getSameSide(index1, index2);
   int t1=0,t2=0;
   if(side>=0){
@@ -43,7 +43,7 @@ Action MagicOperator::getActionSameWay(int index1,int index2){
     if (t1%3==t2%3 && t1%3 != 1) {
       return Action(side,t1%3==2);
     }
-  }else if(useForMiddle){
+  }else {
     side=getSameMiddle(index1, index2);
     if(side < 0) return Action(-1);
     t1=getNumInMiddle(side, index1);
@@ -56,7 +56,7 @@ Action MagicOperator::getActionSameWay(int index1,int index2){
 }
 
 Action MagicOperator::getActionDisWay(int index1,int index2){
-  if(!useDisWay) return Action(-1);
+  if(!singleWay) return Action(-1);
   int side=getSameSide(index1,index2);
   int t1=0,t2=0;
   int d1,d2;
@@ -73,7 +73,7 @@ Action MagicOperator::getActionDisWay(int index1,int index2){
     if(d1==d2)
       return Action(-1);
     return Action(side,d1<d2);
-  }else if(useForMiddle){
+  }else {
     side=getSameMiddle(index1, index2);
     if(side < 0) return Action(-1);
     t1=getNumInMiddle(side, index1);
@@ -158,7 +158,44 @@ void MagicOperator::removeKey(int index){
 MagicOperator::MagicOperator(Magic *magic,Keypad *kpd){
   this->magic=magic;
   this->kpd=kpd;
+ if(rom.isNewone()){
+    setDoubleSame();
+    setDoubleDis();
+    setSingleWay();
+    setFaceInit();
+  }else{
+    setDoubleSame(rom.getDobuleSame(),true);
+    setDoubleDis(rom.getDoubleDis(),true);
+    setSingleWay(rom.getSingleWay(),true);
+    setFaceInit(rom.getFrontSide(),rom.getDownSide(),true);
+  }
 }
+
+void MagicOperator::setDoubleSame(bool doubleSame,bool fromMem){
+  this->doubleSame=doubleSame;
+  if(!fromMem)
+    rom.setDoubleSame(doubleSame);
+}
+bool MagicOperator::getDoubleSame(){
+  return doubleSame;
+}
+void MagicOperator::setDoubleDis(bool doubleDis,bool fromMem){
+  this->doubleDis=doubleDis;
+  if(!fromMem)
+    rom.setDoubleDis(doubleDis);
+}
+bool MagicOperator::getDoubleDis(){
+  return doubleDis;
+}
+void MagicOperator::setSingleWay(bool singleWay,bool fromMem){
+  this->singleWay=singleWay;
+  if(!fromMem)
+    rom.setSingleWay(singleWay);
+}
+bool MagicOperator::getSignleWay(){
+  return singleWay;
+}
+
 
 void MagicOperator::update(){
   if(!kpd->getKeys())  return;
@@ -212,10 +249,14 @@ void MagicOperator::update(){
 
 }
 
-void MagicOperator::setFace(int frontSide,int downSide){
+void MagicOperator::setFaceInit(byte frontSide,byte downSide,bool fromMem){
   this->frontSide=frontSide;
   this->downSide=downSide;
   t=getT(frontSide,downSide)>=0?getT(frontSide,downSide):t;
+  if(!fromMem){
+    rom.setFrontSide(frontSide);
+    rom.setDownSide(downSide);
+  }
 }
 
 int MagicOperator::getT(int frontSide,int downSide){
@@ -246,7 +287,7 @@ int MagicOperator::setFace(){
       if(i!=j){
         tmpT=getT(plist[i].face, plist[j].face);
         if(tmpT>=0&&getNum(plist[i],tmpT,plist[i].face)==3&&getNum(plist[3-i-j],tmpT,plist[i].face)==7){
-          setFace(plist[i].face, plist[j].face);
+          setFaceInit(plist[i].face, plist[j].face);
           magic->showFace(plist[i].face, plist[j].face);
           return 0;
         }
@@ -279,7 +320,8 @@ int MagicOperator::clear(){
     if(tmpP.getNum()%2!=0 || tmpP.getNum()==8)
       return -1;
   }
-  magic->clear();
+  magic->setCell();
+  magic->OK();
 }
 int MagicOperator::random(){
   int side=P(keys[0]).face;
@@ -304,7 +346,7 @@ Action MagicOperator::getAction(int index){
   }else if(p.getNum()==7){
     return Action(SIDE[p.face][3],true,false);
   }
-  if(!useSingle) return Action(-1);
+  if(!singleWay) return Action(-1);
   int num=getNum(p);
   if(num<0) return Action(-1);
   if(p.face==frontSide){
