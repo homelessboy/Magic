@@ -30,6 +30,8 @@ int Magic::getIndex(int face, int i) {
 }
 
 CRGB Magic::getMask(CRGB ledi,CRGB maski){
+  if(maskRound==0)
+    return ledi;
   if(maski.r==0 && maski.g==0 && maski.b==0){
     return ledi;
   }else{
@@ -39,11 +41,13 @@ CRGB Magic::getMask(CRGB ledi,CRGB maski){
 
 Magic::Magic(CRGB *led){
   this->led=led;
+  lastUpdate=millis();
   if(rom.isNewone()){
     setDefault();
   }else{
     setFromMem();
   }
+  setStandbyTime();
 }
 
 void Magic::setFromMem(){
@@ -210,6 +214,13 @@ void Magic::setTimeP(unsigned long timeP,bool fromMem){
 unsigned long Magic::getTimeP(){
   return timeP;
 }
+void Magic::setStandbyTime(unsigned long standbyTime){
+  this->standbyTime=standbyTime;
+}
+unsigned long Magic::getStandbyTime(){
+  return standbyTime;
+}
+
 void Magic::rotationMiddle(int surface, bool cw, int step) {
   rotationP(MIDDLE[surface], cw, 12, step);
 }
@@ -227,11 +238,32 @@ void Magic::getLed(){
     led[i]=color[cells[i]];
   }
   nowTime=millis();
+
   if(nowTime<showTime){
     for(int i=0;i<54;i++)
       led[i]=SHOW[i];
     return;
   }
+
+  if(standbyTime>0 && (nowTime-lastUpdate > standbyTime)){
+    byte index=(nowTime-lastUpdate)/1000;
+    for(int i=0;i<6;i++){
+      byte animationIndex=(i+index+1)%3;
+      for(int j=0;j<9;j++){
+        if(i<4&&i>0){
+          if(animation[animationIndex*9+j]==0){
+            led[i*9+j]=0;
+          }else{
+            led[i*9+j]=color[animation[animationIndex*9+j]];
+          }
+        }else{
+          led[i*9+j]=0;
+        }
+      }
+    }
+    return ;
+  }
+
   if(startTime>0){
     int step=0;
     if(circleStep>0){
@@ -276,7 +308,6 @@ void Magic::getLed(){
 void Magic::update(){
   if(startTime==0&&actionIndex>0){
     startTime=millis();
-    lastUpdate=millis();
     if(actions[0].isSide){
       circleStep=circlePS;
       surfaceStep=surfacePS;
@@ -324,6 +355,7 @@ void Magic::update(){
     }
   }
   if(startTime!=0&&circleStep==0&&surfaceStep==0&&middleStep==0){
+    lastUpdate=millis();
     startTime=0;
     operatSide=-1;
     if(actionIndex==0&&tmpTimeP>0){
@@ -375,12 +407,13 @@ void Magic::random(int i,unsigned long timeRandom){
 
 void Magic::save(){
   numMeM++;
-  if(numMeM>5)
+  if(numMeM>5){
     numMeM=5;
+    delete(cellMem[4]);
+  }
   for(int i=numMeM;i>1;i--){
     cellMem[i-1]=cellMem[i-2];
   }
-  delete(cellMem[0]);
   cellMem[0]=new byte[54];
   for(int i=0;i<54;i++){
     cellMem[0][i]=cells[i];

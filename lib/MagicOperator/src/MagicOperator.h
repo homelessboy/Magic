@@ -9,10 +9,10 @@ class MagicOperator{
 private:
   Magic *magic;
   byte frontSide=0,downSide=4;
-  bool doubleSame=false,doubleDis=true,singleWay=true;
+  bool doubleSame=true,doubleDis=true,singleWay=true;
   int t;
-  int keys[54];
-  int keyNum=0;
+  byte keys[54];
+  byte keyNum=0;
   Keypad *kpd;
   bool actionEnd=true;
   EEPROMOperator rom=EEPROMOperator();
@@ -62,7 +62,7 @@ public:
 //  1:RIGHT[frontSide]=downSide;
 //  2:UP[frontSide]=downSide;
 //  3:LEFT[frontSide]=downSide;
-static int surfaceD[6][4][6]={
+static byte surfaceD[6][4][6]={
   {
     {0,0,0,0,0,0},
     {2,2,6,2,2,2},

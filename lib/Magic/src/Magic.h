@@ -28,6 +28,7 @@ private:
   int memChoice=-1;
   unsigned long startTime,lastUpdate,nowTime,timeP,showTime,tmpTimeP;
   unsigned long timeTTT=0;
+  unsigned long standbyTime;
   byte circleStep,middleStep,surfaceStep,operatSide;
   bool cw;
   byte circlePS,middlePS,surfacePS,maskRound;
@@ -48,7 +49,7 @@ public:
   void setMemDefault();
   void setMemFromMem();
   void saveMem();
-  
+
   void setMask8(CRGB *mask8=NULL,bool fromMem=false);
   CRGB* getMask8();
   void setMask12(CRGB *mask12=NULL,bool fromMem=false);
@@ -65,6 +66,9 @@ public:
   byte getMaskRound();
   void setTimeP(unsigned long timeP=500,bool fromMem=false);
   unsigned long getTimeP();
+  void setStandbyTime(unsigned long standbyTime=0);
+
+  unsigned long getStandbyTime();
 
   void rotationMiddle(int surface,bool cw=true,int step=1);
   void rotationSurface(int surface,bool cw=true,int step=1);
@@ -83,5 +87,28 @@ public:
   void OK(unsigned long time=500);
   void NOTOK(unsigned long time=500);
 };
+static byte animation[54]={
+    3,3,3,
+    0,3,0,
+    0,3,0,
 
+    3,0,3,
+    3,3,3,
+    3,0,3,
+
+    3,0,3,
+    3,3,0,
+    3,0,3,
+
+    3,3,3,
+    3,3,3,
+    3,3,3,
+
+    4,4,4,
+    4,4,4,
+    4,4,4,
+    5,5,5,
+    5,5,5,
+    5,5,5,
+};
 #endif //MAGIC_H

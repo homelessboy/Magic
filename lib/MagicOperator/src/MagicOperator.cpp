@@ -56,7 +56,7 @@ Action MagicOperator::getActionSameWay(int index1,int index2){
 }
 
 Action MagicOperator::getActionDisWay(int index1,int index2){
-  if(!singleWay) return Action(-1);
+  if(!doubleDis) return Action(-1);
   int side=getSameSide(index1,index2);
   int t1=0,t2=0;
   int d1,d2;

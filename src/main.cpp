@@ -1,6 +1,7 @@
 #include <FastLED.h>
 #include "Magic.h"
 #include "MagicOperator.h"
+#include "Trans.h"
 
 #define LED_PIN     2
 #define COLOR_ORDER RGB
@@ -22,10 +23,11 @@ char keys[6][9] = {
 byte rowPins[ROWS] = {32, 33, 34, 35, 36, 37}; //connect to the row pinouts of the kpd
 byte colPins[COLS] = {22, 23, 24, 25, 26, 27, 28, 29, 30}; //connect to the column pinouts of the kpd
 Keypad kpd = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
-
 Magic magic=Magic(leds);
 MagicOperator magicOperator=MagicOperator(&magic,&kpd);
 EEPROMOperator rom=EEPROMOperator();
+Trans trans=Trans(&magic,&magicOperator);
+// BTSetting btSetting=BTSetting(&magic, &magicOperator);
 unsigned long startTimeF,startTimeC;
 int fram;
 
@@ -37,10 +39,13 @@ void setup(){
   FastLED.show();
   startTimeF=millis();
   startTimeC=millis();
-  rom.setNewone(false);  
+  rom.setNewone(false);
+  Serial.println("in setUp");
+  // trans.setBTSetting(&btSetting);
 }
 
 void loop(){
+ trans.read();
   // while(Serial1.available()){
   //   String read=Serial1.readStringUntil('\n');
   //   Serial.print(read);

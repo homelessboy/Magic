@@ -4,32 +4,32 @@
 
 #ifndef P_H
 #define P_H
-
-static int NUM[3][3]={
+#include "Arduino.h"
+static byte NUM[3][3]={
   {0,1,2},
   {7,8,3},
   {6,5,4},
 };
 
 struct P {
-    int face;
-    int x;
-    int y;
+    byte face;
+    byte x;
+    byte y;
 public:
-    P(int face, int y, int x) {
+    P(byte face, byte y, byte x) {
         this->face = face;
         this->y = y;
         this->x = x;
     }
-    P(int index=0){
+    P(byte index=0){
         this->face=index/9;
         this->y=(index%9)/3;
         this->x=(index%9)%3;
     }
-    int getIndex() const {
+    byte getIndex() const {
         return face * 9 + y * 3 + x;
     }
-    int getNum() const{
+    byte getNum() const{
       return NUM[y][x];
     }
 };
@@ -62,7 +62,7 @@ static P MIDDLE[6][12]={
 };
 
 //0:右；  1：下；  2：左；  3：上； 4：对面；5：自己；
-static int SIDE[6][6]={
+static byte SIDE[6][6]={
   {1,4,3,5,2,0},
   {2,4,0,5,3,1},
   {3,4,1,5,0,2},
