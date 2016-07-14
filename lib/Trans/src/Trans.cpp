@@ -156,6 +156,11 @@ void Trans::hand(byte head,int length){
       magic->OK(100);
       write(COLOR_AC,magic->getColor(),6);
       break;
+    case STANDBY_TIME_AC:
+      magic->setStandbyTime(readLong());
+      magic->OK(100);
+      write(STANDBY_TIME_AC,magic->getStandbyTime());
+      break;
     default:
       break;
   };
@@ -170,4 +175,5 @@ void Trans::sync(){
   write(TIME_P_AC,magic->getTimeP());
   write(MASK_ROUND_AC,magic->getMaskRound());
   write(COLOR_AC,magic->getColor(),6);
+  write(STANDBY_TIME_AC,magic->getStandbyTime());
 }

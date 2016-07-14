@@ -41,13 +41,12 @@ CRGB Magic::getMask(CRGB ledi,CRGB maski){
 
 Magic::Magic(CRGB *led){
   this->led=led;
-  lastUpdate=millis();
+  lastUpdate=millis();  
   if(rom.isNewone()){
     setDefault();
   }else{
     setFromMem();
   }
-  setStandbyTime();
 }
 
 void Magic::setFromMem(){
@@ -64,6 +63,7 @@ void Magic::setFromMem(){
   setMask12(rom.getMask12(),true);
   setColor(rom.getColor(),true);
   setCell(rom.getCell(),true);
+  setStandbyTime(rom.getStandbyTime(),true);
   setMemFromMem();
 }
 
@@ -81,6 +81,7 @@ void Magic::setDefault(){
   setMask12();
   setColor();
   setCell();
+  setStandbyTime();
   setMemDefault();
 }
 
@@ -214,8 +215,10 @@ void Magic::setTimeP(unsigned long timeP,bool fromMem){
 unsigned long Magic::getTimeP(){
   return timeP;
 }
-void Magic::setStandbyTime(unsigned long standbyTime){
+void Magic::setStandbyTime(unsigned long standbyTime,bool fromMem){
   this->standbyTime=standbyTime;
+  if(!fromMem)
+    rom.setStandbyTime(standbyTime);
 }
 unsigned long Magic::getStandbyTime(){
   return standbyTime;

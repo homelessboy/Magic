@@ -73,6 +73,9 @@ public:
 
   void setMask12(CRGB* mask12);
   CRGB* getMask12();
+
+  void setStandbyTime(unsigned long standbyTime);
+  unsigned long getStandbyTime();
 };
 
 static int NEW_ONE=0;
@@ -92,6 +95,7 @@ static int MASK_ROUND=281;
 static int TIME_P=282;//size=4
 static int MASK_8=286;//size=8*3=24;
 static int MASK_12=310;//size=12*3=36
+static int STANDBY_TIME=346;//size=4;
 
 
 #endif //EEPROMOPERATOR_H

@@ -45,7 +45,7 @@ byte* EEPROMOperator::getCells(int address){
   byte* read=new byte[54];
   byte tmp;
   for(int i=0;i<18;i++){
-    tmp=EEPROM.read(address+i);    
+    tmp=EEPROM.read(address+i);
     read[i*3+2]=tmp%6;
     tmp=tmp/6;
     read[i*3+1]=tmp%6;
@@ -207,6 +207,14 @@ void EEPROMOperator::setMask12(CRGB* mask12){
 
 CRGB* EEPROMOperator::getMask12(){
   return getCRGBs(12,MASK_12);
+}
+
+void EEPROMOperator::setStandbyTime(unsigned long standbyTime){
+  setLong(standbyTime,STANDBY_TIME);
+}
+
+unsigned long EEPROMOperator::getStandbyTime(){
+  return getLong(STANDBY_TIME);
 }
 
 // void EEPROMOperator::saveCells(byte *cells){

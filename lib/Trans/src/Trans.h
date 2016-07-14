@@ -13,6 +13,7 @@ static const byte DOUBLE_DIS_AC=0x07;
 static const byte TIME_P_AC=0x08;
 static const byte MASK_ROUND_AC=0x09;
 static const byte COLOR_AC=0x0A;
+static const byte STANDBY_TIME_AC=0x0B;
 
 class Trans{
 private:

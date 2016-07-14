@@ -66,8 +66,7 @@ public:
   byte getMaskRound();
   void setTimeP(unsigned long timeP=500,bool fromMem=false);
   unsigned long getTimeP();
-  void setStandbyTime(unsigned long standbyTime=0);
-
+  void setStandbyTime(unsigned long standbyTime=10000,bool fromMem=false);
   unsigned long getStandbyTime();
 
   void rotationMiddle(int surface,bool cw=true,int step=1);
